@@ -38,19 +38,44 @@ function obterEndereco(idUsuario) {
     })
 }
 
-const usuario = obterUsuario()
-usuario.then(function (res) {
-    return obterTelefone(res.id).then(function resolveTelefone(result) {
-        return {
-            usuario: res,
-            telefone: result
-        }
-    })
-}).then(function (res) {
-    console.log('resultado', res)
-}).catch(function (error) {
-    console.error('Deu ruim no user', error)
-})
+main()
+async function main() {
+    try {
+        console.time('medida-promisse')
+        const usuario = await obterUsuario()
+        // const telefone = await obterTelefone()
+        // const endereco = await obterEndereco()
+        const resultado = await Promise.all([
+            obterTelefone(),
+            obterEndereco()
+        ])
+
+        const telefone = resultado[0]
+        const endereco = resultado[1]
+
+        console.log(`
+            Usuario: ${usuario.nome},
+            Endereco: ${endereco.rua}, ${endereco.bairro},
+            Telefone: (${telefone.ddd}) ${telefone.numero}
+        `)
+        console.timeEnd('medida-promisse')
+    } catch (error) {
+        console.log('main error', error)
+    }
+}
+// const usuario = obterUsuario()
+// usuario.then(function (res) {
+//     return obterTelefone(res.id).then(function resolveTelefone(result) {
+//         return {
+//             usuario: res,
+//             telefone: result
+//         }
+//     })
+// }).then(function (res) {
+//     console.log('resultado', res)
+// }).catch(function (error) {
+//     console.error('Deu ruim no user', error)
+// })
 // obterUsuario(function resolverUsuario(error, usuario) {
 //     if (error) {
 //         console.error("Deu ruim em usuario", error)
